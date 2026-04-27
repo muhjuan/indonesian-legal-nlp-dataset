@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Indonesian Legal Unit",
+  "type": "object",
+  "required": [
+    "unit_id",
+    "doc_id",
+    "title",
+    "reg_type",
+    "hierarchy_level",
+    "year",
+    "number",
+    "chapter",
+    "chapter_title",
+    "article",
+    "paragraph",
+    "item",
+    "text",
+    "source_url",
+    "source_file",
+    "language",
+    "created_at"
+  ],
+  "properties": {
+    "unit_id": { "type": "string", "minLength": 1 },
+    "doc_id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "reg_type": { "type": "string", "minLength": 1 },
+    "hierarchy_level": { "type": "integer" },
+    "year": { "type": "integer" },
+    "number": { "type": "string" },
+    "chapter": { "type": "string" },
+    "chapter_title": { "type": "string" },
+    "article": { "type": "string" },
+    "paragraph": { "type": "string" },
+    "item": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ]
+    },
+    "text": { "type": "string", "minLength": 1 },
+    "source_url": { "type": "string" },
+    "source_file": { "type": "string", "minLength": 1 },
+    "language": { "type": "string", "const": "id" },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

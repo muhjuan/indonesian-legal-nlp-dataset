@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.DS_Store
+.pytest_cache/
+.venv/
+venv/
+data/raw/pdf/*
+!data/raw/pdf/.gitkeep
+data/processed/*.jsonl
+!data/processed/*.sample.jsonl
+data/processed/*.json
+data/annotations/*.jsonl
+!data/annotations/*.sample.jsonl

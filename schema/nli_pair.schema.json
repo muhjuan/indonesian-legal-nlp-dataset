@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Indonesian Legal NLI Pair",
+  "type": "object",
+  "required": [
+    "pair_id",
+    "premise_id",
+    "hypothesis_id",
+    "premise",
+    "hypothesis",
+    "label",
+    "legal_issue",
+    "confidence"
+  ],
+  "properties": {
+    "pair_id": { "type": "string", "minLength": 1 },
+    "premise_id": { "type": "string", "minLength": 1 },
+    "hypothesis_id": { "type": "string", "minLength": 1 },
+    "premise": { "type": "string", "minLength": 1 },
+    "hypothesis": { "type": "string", "minLength": 1 },
+    "label": {
+      "type": "string",
+      "enum": ["entailment", "contradiction", "neutral"]
+    },
+    "legal_issue": { "type": "string", "minLength": 1 },
+    "confidence": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+  },
+  "additionalProperties": false
+}
