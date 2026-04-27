@@ -9,6 +9,7 @@ data/raw/pdf/*
 data/processed/*.jsonl
 !data/processed/*.sample.jsonl
 data/processed/*.json
+!data/processed/*.sample.json
 data/annotations/*.jsonl
 !data/annotations/*.sample.jsonl
 data/annotations/nli_manual/*.jsonl

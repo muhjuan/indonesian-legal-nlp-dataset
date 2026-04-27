@@ -108,6 +108,10 @@ python scripts/generate_statistics.py \
 - Validation report: `data/processed/validation_report.json`
 - Statistics report: `data/processed/statistics.json`
 
+Public sample report files (for manuscript traceability):
+- `data/processed/validation_report.sample.json`
+- `data/processed/statistics.sample.json`
+
 ## Annotation Policy (Important)
 
 This repository follows the dissertation workflow in `01-PPT DCS 2025 - Proposal R.2.1.pptx`:

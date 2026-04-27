@@ -1,0 +1,14 @@
+{
+  "total_documents": 2,
+  "total_units": 4,
+  "total_pasal": 3,
+  "total_ayat": 3,
+  "token_count": 71,
+  "total_nli_pairs": 3,
+  "label_distribution": {
+    "entailment": 1,
+    "contradiction": 0,
+    "neutral": 2
+  },
+  "processing_success_rate": 0.0
+}

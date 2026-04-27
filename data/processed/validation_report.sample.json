@@ -1,0 +1,18 @@
+{
+  "validation_mode": "corpus+nli_manual",
+  "dataset_records": 4,
+  "nli_records": 3,
+  "schema_issues": {
+    "legal": [],
+    "nli": []
+  },
+  "duplicate_issues": {
+    "unit_id_duplicates": [],
+    "pair_id_duplicates": []
+  },
+  "missing_field_issues": {
+    "legal": [],
+    "nli": []
+  },
+  "random_sampling_issues": []
+}
