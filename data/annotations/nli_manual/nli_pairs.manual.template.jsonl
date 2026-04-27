@@ -1,0 +1,10 @@
+﻿{
+  "pair_id": "PAIR-EXAMPLE-0001",
+  "premise_id": "UNIT-...",
+  "hypothesis_id": "UNIT-...",
+  "premise": "<copy legal unit text>",
+  "hypothesis": "<copy legal unit text>",
+  "label": "neutral",
+  "legal_issue": "Pasal ...",
+  "confidence": 0.0
+}

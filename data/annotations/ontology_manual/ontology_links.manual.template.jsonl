@@ -1,0 +1,8 @@
+﻿{
+  "relation_id": "REL-EXAMPLE-0001",
+  "source_unit_id": "UNIT-...",
+  "target_unit_id": "UNIT-...",
+  "relation_type": "lex_superior",
+  "annotator": "<name>",
+  "notes": "<justification>"
+}

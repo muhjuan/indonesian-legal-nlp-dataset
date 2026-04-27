@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Validate dataset and NLI JSONL against schema plus quality checks."""
+"""Validate corpus dataset and (optionally) manual NLI JSONL against schema."""
 
 from __future__ import annotations
 
@@ -83,9 +83,19 @@ def validate_records_with_schema(records: list[dict[str, Any]], schema: dict[str
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Validate schema and quality controls.")
     parser.add_argument("--dataset", type=Path, default=Path("data/processed/legal_units.jsonl"))
-    parser.add_argument("--nli-dataset", type=Path, default=Path("data/annotations/nli_pairs.jsonl"))
+    parser.add_argument(
+        "--nli-dataset",
+        type=Path,
+        default=None,
+        help="Optional manual NLI dataset path. Leave unset to validate corpus-only.",
+    )
     parser.add_argument("--schema", type=Path, default=Path("schema/legal_unit.schema.json"))
-    parser.add_argument("--nli-schema", type=Path, default=Path("schema/nli_pair.schema.json"))
+    parser.add_argument(
+        "--nli-schema",
+        type=Path,
+        default=Path("schema/nli_pair.schema.json"),
+        help="Used only when --nli-dataset is provided.",
+    )
     parser.add_argument("--sample-size", type=int, default=30)
     parser.add_argument("--output", type=Path, default=Path("data/processed/validation_report.json"))
     return parser
@@ -94,27 +104,33 @@ def build_arg_parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = build_arg_parser().parse_args()
     dataset = read_jsonl(args.dataset)
-    nli_dataset = read_jsonl(args.nli_dataset)
     legal_schema = read_json(args.schema)
-    nli_schema = read_json(args.nli_schema)
 
     legal_required = list(legal_schema.get("required", []))
-    nli_required = list(nli_schema.get("required", []))
+    nli_dataset: list[dict[str, Any]] = []
+    nli_schema: dict[str, Any] = {}
+    nli_required: list[str] = []
+    nli_enabled = bool(args.nli_dataset and args.nli_dataset.exists())
+    if nli_enabled:
+        nli_dataset = read_jsonl(args.nli_dataset)
+        nli_schema = read_json(args.nli_schema)
+        nli_required = list(nli_schema.get("required", []))
 
     report = {
+        "validation_mode": "corpus+nli_manual" if nli_enabled else "corpus_only",
         "dataset_records": len(dataset),
         "nli_records": len(nli_dataset),
         "schema_issues": {
             "legal": validate_records_with_schema(dataset, legal_schema),
-            "nli": validate_records_with_schema(nli_dataset, nli_schema),
+            "nli": validate_records_with_schema(nli_dataset, nli_schema) if nli_enabled else [],
         },
         "duplicate_issues": {
             "unit_id_duplicates": find_duplicates(dataset, "unit_id"),
-            "pair_id_duplicates": find_duplicates(nli_dataset, "pair_id"),
+            "pair_id_duplicates": find_duplicates(nli_dataset, "pair_id") if nli_enabled else [],
         },
         "missing_field_issues": {
             "legal": find_missing_fields(dataset, legal_required),
-            "nli": find_missing_fields(nli_dataset, nli_required),
+            "nli": find_missing_fields(nli_dataset, nli_required) if nli_enabled else [],
         },
         "random_sampling_issues": random_sampling_check(dataset, args.sample_size),
     }

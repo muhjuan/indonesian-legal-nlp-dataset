@@ -1,0 +1,9 @@
+﻿{
+  "verification_id": "FV-EXAMPLE-0001",
+  "pair_id": "PAIR-...",
+  "smtlib_path": "formal/ruleset_001.smt2",
+  "solver": "z3",
+  "result": "UNKNOWN",
+  "annotator": "<name>",
+  "notes": "<SAT/UNSAT interpretation>"
+}

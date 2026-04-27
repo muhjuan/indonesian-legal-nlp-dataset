@@ -36,7 +36,11 @@ def compute_processing_success_rate(extraction_records: list[dict[str, Any]]) ->
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Generate statistics for legal dataset.")
     parser.add_argument("--dataset", type=Path, default=Path("data/processed/legal_units.jsonl"))
-    parser.add_argument("--nli-dataset", type=Path, default=Path("data/annotations/nli_pairs.jsonl"))
+    parser.add_argument(
+        "--nli-dataset",
+        type=Path,
+        default=Path("data/annotations/nli_manual/nli_pairs.manual.jsonl"),
+    )
     parser.add_argument("--extraction-log", type=Path, default=Path("data/processed/extracted_text.jsonl"))
     parser.add_argument("--output", type=Path, default=Path("data/processed/statistics.json"))
     return parser

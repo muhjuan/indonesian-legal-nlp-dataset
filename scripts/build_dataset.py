@@ -1,11 +1,15 @@
 #!/usr/bin/env python
-"""Build final JSONL dataset and NLI pairs from segmented legal units."""
+"""Build final JSONL corpus dataset from segmented legal units.
+
+Important design note (aligned with Proposal R.2.1):
+- This script automates corpus construction only.
+- NLI, ontology, and formal verification artifacts are curated manually.
+"""
 
 from __future__ import annotations
 
 import argparse
 import hashlib
-import itertools
 import json
 import re
 from datetime import datetime, timezone
@@ -103,83 +107,16 @@ def build_legal_units(segmented_units: list[dict[str, Any]]) -> list[dict[str, A
     return units
 
 
-def token_set(text: str) -> set[str]:
-    return set(re.findall(r"[A-Za-z0-9]+", text.lower()))
-
-
-def has_negation(text: str) -> bool:
-    return any(k in text.lower() for k in (" tidak ", " bukan ", " dilarang ", " kecuali "))
-
-
-def infer_label(premise: str, hypothesis: str) -> tuple[str, float]:
-    p_tokens = token_set(premise)
-    h_tokens = token_set(hypothesis)
-    if not p_tokens or not h_tokens:
-        return "neutral", 0.4
-
-    overlap = len(p_tokens & h_tokens) / max(1, len(p_tokens | h_tokens))
-    p_neg = has_negation(f" {premise.lower()} ")
-    h_neg = has_negation(f" {hypothesis.lower()} ")
-
-    if overlap >= 0.40 and p_neg != h_neg:
-        return "contradiction", min(0.95, 0.60 + overlap)
-    if overlap >= 0.55 and p_neg == h_neg:
-        return "entailment", min(0.95, 0.55 + overlap)
-    return "neutral", max(0.45, overlap)
-
-
-def infer_legal_issue(article: str, text: str) -> str:
-    if article:
-        return article
-    if "pemilih" in text.lower():
-        return "Pemilih"
-    if "kpu" in text.lower():
-        return "KPU"
-    return "Isu Umum"
-
-
-def generate_nli_pairs(units: list[dict[str, Any]], max_pairs: int) -> list[dict[str, Any]]:
-    """Generate heuristic NLI pairs for quick contradiction baseline."""
-    grouped: dict[tuple[str, str], list[dict[str, Any]]] = {}
-    for u in units:
-        key = (u.get("doc_id", ""), u.get("article", ""))
-        grouped.setdefault(key, []).append(u)
-
-    pairs: list[dict[str, Any]] = []
-    for (_, article), article_units in grouped.items():
-        for a, b in itertools.combinations(article_units, 2):
-            if len(pairs) >= max_pairs:
-                return pairs
-
-            premise = a.get("text", "")
-            hypothesis = b.get("text", "")
-            label, confidence = infer_label(premise, hypothesis)
-            pair_id = stable_hash([a["unit_id"], b["unit_id"], label], prefix="PAIR")
-            pairs.append(
-                {
-                    "pair_id": pair_id,
-                    "premise_id": a["unit_id"],
-                    "hypothesis_id": b["unit_id"],
-                    "premise": premise,
-                    "hypothesis": hypothesis,
-                    "label": label,
-                    "legal_issue": infer_legal_issue(article, premise),
-                    "confidence": round(float(confidence), 4),
-                }
-            )
-    return pairs
-
-
-def save_build_report(path: Path, units: list[dict[str, Any]], nli_pairs: list[dict[str, Any]]) -> None:
+def save_build_report(path: Path, units: list[dict[str, Any]]) -> None:
     report = {
         "generated_at": utc_now_iso(),
         "total_units": len(units),
         "total_docs": len({u["doc_id"] for u in units}),
-        "total_nli_pairs": len(nli_pairs),
-        "labels": {
-            "entailment": sum(1 for p in nli_pairs if p["label"] == "entailment"),
-            "contradiction": sum(1 for p in nli_pairs if p["label"] == "contradiction"),
-            "neutral": sum(1 for p in nli_pairs if p["label"] == "neutral"),
+        "annotation_policy": {
+            "nli": "manual",
+            "ontology_reasoning": "manual",
+            "formal_verification": "manual",
+            "note": "Only corpus construction is automated in this repository.",
         },
     }
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -188,11 +125,9 @@ def save_build_report(path: Path, units: list[dict[str, Any]], nli_pairs: list[d
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Build final legal dataset and NLI pairs.")
+    parser = argparse.ArgumentParser(description="Build final legal corpus dataset (automated corpus stage).")
     parser.add_argument("--input", type=Path, default=Path("data/processed/segmented_units.jsonl"))
     parser.add_argument("--output", type=Path, default=Path("data/processed/legal_units.jsonl"))
-    parser.add_argument("--nli-output", type=Path, default=Path("data/annotations/nli_pairs.jsonl"))
-    parser.add_argument("--max-nli-pairs", type=int, default=1000)
     parser.add_argument("--report-output", type=Path, default=Path("data/processed/build_report.json"))
     return parser
 
@@ -201,14 +136,12 @@ def main() -> int:
     args = build_arg_parser().parse_args()
     segmented = read_jsonl(args.input)
     units = build_legal_units(segmented)
-    nli_pairs = generate_nli_pairs(units, max_pairs=args.max_nli_pairs)
 
     write_jsonl(args.output, units)
-    write_jsonl(args.nli_output, nli_pairs)
-    save_build_report(args.report_output, units, nli_pairs)
+    save_build_report(args.report_output, units)
 
     print(f"Wrote {len(units)} legal units -> {args.output}")
-    print(f"Wrote {len(nli_pairs)} NLI pairs -> {args.nli_output}")
+    print("NLI / ontology / formal verification artifacts are manual (not auto-generated).")
     print(f"Build report -> {args.report_output}")
     return 0
 

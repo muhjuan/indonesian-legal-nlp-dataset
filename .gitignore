@@ -11,3 +11,12 @@ data/processed/*.jsonl
 data/processed/*.json
 data/annotations/*.jsonl
 !data/annotations/*.sample.jsonl
+data/annotations/nli_manual/*.jsonl
+!data/annotations/nli_manual/*.template.jsonl
+!data/annotations/nli_manual/*.sample.jsonl
+data/annotations/ontology_manual/*.jsonl
+!data/annotations/ontology_manual/*.template.jsonl
+!data/annotations/ontology_manual/*.sample.jsonl
+data/annotations/formal_verification_manual/*.jsonl
+!data/annotations/formal_verification_manual/*.template.jsonl
+!data/annotations/formal_verification_manual/*.sample.jsonl
