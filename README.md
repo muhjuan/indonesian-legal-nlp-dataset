@@ -130,3 +130,4 @@ This repository follows the dissertation workflow in `01-PPT DCS 2025 - Proposal
 - FAIR guidelines: `docs/FAIR.md`
 - Reproducibility notes: `docs/reproducibility.md`
 - Data dictionary and field definitions: `DATA.md`
+- RQ1 study-scale reporting summary: `docs/rq1_study_scale_summary.md`
